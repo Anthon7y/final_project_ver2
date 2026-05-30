@@ -25,8 +25,8 @@ orm_db.init_app(app)
 jwt = JWTManager(app)
 socketio = SocketIO(app, cors_allowed_origins='*', async_mode='threading')
 
-from database import Database
-from ai_analyzer import FurnitureAnalyzer
+from backend.database import Database
+from backend.ai_analyzer import FurnitureAnalyzer
 import bcrypt
 
 db = Database()
