@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
     os.path.dirname(__file__), '..', 'furniture.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-from models import db as orm_db
+from backend.models import db as orm_db
 orm_db.init_app(app)
 
 jwt = JWTManager(app)
