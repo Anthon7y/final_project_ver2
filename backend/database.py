@@ -1,5 +1,5 @@
 from sqlalchemy import or_
-from models import db, Furniture, User, Favorite
+from backend.models import db, Furniture, User, Favorite
 
 
 def _split(val):
