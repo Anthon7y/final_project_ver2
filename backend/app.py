@@ -323,6 +323,7 @@ def get_materials():
     return jsonify({'materials': sorted(db.get_distinct_values('materials'))})
     
 #----------------попытка помочь себе------#
+from flask import send_from_directory
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react_app(path):
