@@ -322,7 +322,7 @@ def get_colors():
 def get_materials():
     return jsonify({'materials': sorted(db.get_distinct_values('materials'))})
     
-#----------------попытка помочь себе------#
+#----------------попытка помочь себе---------------------------------------------------------------------------------------#
 from flask import send_from_directory
 import os
 
@@ -334,22 +334,42 @@ def serve_react_app(path):
         return {"error": "Not found"}, 404
 
     build_dir = os.path.join(os.path.dirname(__file__), 'static')
+    
+    # Запрос корня — генерируем HTML с правильными ссылками
+    if not path or path == 'index.html':
+        html = """
+        <!DOCTYPE html>
+        <html lang="ru">
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="description" content="Помощник по подбору мебели - найдите мебель по фото" />
+            <title>Помощник по подбору мебели</title>
+            <link href="/static/static/css/main.8cd491c6.css" rel="stylesheet">
+        </head>
+        <body>
+            <noscript>Для работы сайта необходим JavaScript.</noscript>
+            <div id="root"></div>
+            <script defer="defer" src="/static/static/js/main.68e81bb2.js"></script>
+        </body>
+        </html>
+        """
+        return html, 200, {'Content-Type': 'text/html'}
 
-    # Запрос корня или index.html
-    if path == '' or path == 'index.html':
-        return send_from_directory(build_dir, 'index.html')
-
-    # Пробуем найти файл по запрошенному пути
-    full_path = os.path.join(build_dir, path)
-    if os.path.exists(full_path) and os.path.isfile(full_path):
+    # Обработка запросов к статическим файлам (JS, CSS, картинки)
+    # Если путь начинается с 'static/', ищем в подпапке static
+    if path.startswith('static/'):
+        # Убираем 'static/' и ищем внутри build_dir/static
+        sub_path = path[7:]
+        alt_path = os.path.join(build_dir, 'static', sub_path)
+        if os.path.exists(alt_path) and os.path.isfile(alt_path):
+            return send_from_directory(os.path.join(build_dir, 'static'), sub_path)
+    
+    # Если файл лежит прямо в build_dir (например, favicon.ico)
+    direct_path = os.path.join(build_dir, path)
+    if os.path.exists(direct_path) and os.path.isfile(direct_path):
         return send_from_directory(build_dir, path)
-
-    # Пробуем найти файл внутри подпапки static (на случай, если сборка положила туда)
-    alt_path = os.path.join('static', path)
-    full_alt = os.path.join(build_dir, alt_path)
-    if os.path.exists(full_alt) and os.path.isfile(full_alt):
-        return send_from_directory(build_dir, alt_path)
-
+    
     # Всё остальное — отдаём index.html для клиентского роутинга
     return send_from_directory(build_dir, 'index.html')
 
