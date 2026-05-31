@@ -334,41 +334,24 @@ def serve_react_app(path):
         return {"error": "Not found"}, 404
 
     build_dir = os.path.join(os.path.dirname(__file__), 'static')
-    
-    # Если запрос корня — отдаём index.html
-    if not path:
-        return send_from_directory(build_dir, 'index.html')
-    
-    # Пробуем найти файл по прямому пути
-    file_path = os.path.join(build_dir, path)
-    if os.path.exists(file_path) and os.path.isfile(file_path):
-        return send_from_directory(build_dir, path)
-    
-    # Если не нашли, возможно, файл лежит в подпапке static/static
-    alt_path = os.path.join(build_dir, 'static', path)
-    if os.path.exists(alt_path) and os.path.isfile(alt_path):
-        return send_from_directory(os.path.join(build_dir, 'static'), path)
-    
-    # Если и так не нашли, отдаём index.html для клиентского роутинга
-    return send_from_directory(build_dir, 'index.html')
-################
 
-@app.route('/debug/static-files')
-def debug_static():
-    build_dir = os.path.join(os.path.dirname(__file__), 'static')
-    if not os.path.exists(build_dir):
-        return f"Папка {build_dir} не существует"
-    files = os.listdir(build_dir)
-    sub_files = {}
-    for f in files:
-        full = os.path.join(build_dir, f)
-        if os.path.isdir(full):
-            sub_files[f] = os.listdir(full)
-    return {
-        "build_dir": build_dir,
-        "files": files,
-        "subdirs": sub_files
-    }
+    # Запрос корня или index.html
+    if path == '' or path == 'index.html':
+        return send_from_directory(build_dir, 'index.html')
+
+    # Пробуем найти файл по запрошенному пути
+    full_path = os.path.join(build_dir, path)
+    if os.path.exists(full_path) and os.path.isfile(full_path):
+        return send_from_directory(build_dir, path)
+
+    # Пробуем найти файл внутри подпапки static (на случай, если сборка положила туда)
+    alt_path = os.path.join('static', path)
+    full_alt = os.path.join(build_dir, alt_path)
+    if os.path.exists(full_alt) and os.path.isfile(full_alt):
+        return send_from_directory(build_dir, alt_path)
+
+    # Всё остальное — отдаём index.html для клиентского роутинга
+    return send_from_directory(build_dir, 'index.html')
 # ------------------------------------------------------------------ #
 #  Запуск                                                              #
 # ------------------------------------------------------------------ #
