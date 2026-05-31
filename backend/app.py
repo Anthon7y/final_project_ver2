@@ -352,6 +352,15 @@ def serve_react_app(path):
 
     # Всё остальное — отдаём index.html для клиентского роутинга
     return send_from_directory(build_dir, 'index.html')
+
+@app.route('/debug/index')
+def debug_index():
+    build_dir = os.path.join(os.path.dirname(__file__), 'static')
+    index_path = os.path.join(build_dir, 'index.html')
+    if not os.path.exists(index_path):
+        return "index.html not found"
+    with open(index_path, 'r') as f:
+        return f.read(), 200, {'Content-Type': 'text/html'}
 # ------------------------------------------------------------------ #
 #  Запуск                                                              #
 # ------------------------------------------------------------------ #
