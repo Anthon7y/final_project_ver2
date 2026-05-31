@@ -321,8 +321,17 @@ def get_colors():
 @app.route('/api/furniture/materials', methods=['GET'])
 def get_materials():
     return jsonify({'materials': sorted(db.get_distinct_values('materials'))})
-
-
+    
+#----------------попытка помочь себе------#
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react_app(path):
+    if path.startswith('api/') or path.startswith('socket.io/'):
+        return {"error": "Not found"}, 404
+    build_dir = os.path.join(os.path.dirname(__file__), 'static')
+    if path != "" and os.path.exists(os.path.join(build_dir, path)):
+        return send_from_directory(build_dir, path)
+    return send_from_directory(build_dir, 'index.html')
 # ------------------------------------------------------------------ #
 #  Запуск                                                              #
 # ------------------------------------------------------------------ #
