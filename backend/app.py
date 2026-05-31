@@ -324,14 +324,32 @@ def get_materials():
     
 #----------------попытка помочь себе------#
 from flask import send_from_directory
+import os
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react_app(path):
+    # Не трогаем API и WebSocket
     if path.startswith('api/') or path.startswith('socket.io/'):
         return {"error": "Not found"}, 404
+
     build_dir = os.path.join(os.path.dirname(__file__), 'static')
-    if path != "" and os.path.exists(os.path.join(build_dir, path)):
+    
+    # Если запрос корня — отдаём index.html
+    if not path:
+        return send_from_directory(build_dir, 'index.html')
+    
+    # Пробуем найти файл по прямому пути
+    file_path = os.path.join(build_dir, path)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
         return send_from_directory(build_dir, path)
+    
+    # Если не нашли, возможно, файл лежит в подпапке static/static
+    alt_path = os.path.join(build_dir, 'static', path)
+    if os.path.exists(alt_path) and os.path.isfile(alt_path):
+        return send_from_directory(os.path.join(build_dir, 'static'), path)
+    
+    # Если и так не нашли, отдаём index.html для клиентского роутинга
     return send_from_directory(build_dir, 'index.html')
 # ------------------------------------------------------------------ #
 #  Запуск                                                              #
