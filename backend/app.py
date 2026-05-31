@@ -351,6 +351,24 @@ def serve_react_app(path):
     
     # Если и так не нашли, отдаём index.html для клиентского роутинга
     return send_from_directory(build_dir, 'index.html')
+################
+
+@app.route('/debug/static-files')
+def debug_static():
+    build_dir = os.path.join(os.path.dirname(__file__), 'static')
+    if not os.path.exists(build_dir):
+        return f"Папка {build_dir} не существует"
+    files = os.listdir(build_dir)
+    sub_files = {}
+    for f in files:
+        full = os.path.join(build_dir, f)
+        if os.path.isdir(full):
+            sub_files[f] = os.listdir(full)
+    return {
+        "build_dir": build_dir,
+        "files": files,
+        "subdirs": sub_files
+    }
 # ------------------------------------------------------------------ #
 #  Запуск                                                              #
 # ------------------------------------------------------------------ #
