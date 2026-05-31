@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY backend/ /app/backend/
 
 # Копируем собранный фронтенд из /app/frontend/build в backend/static
-COPY --from=frontend-builder /app/frontend/build /app/backend/static
+COPY --from=frontend-builder /app/frontend/build/. /app/backend/static/
 
 EXPOSE 5000
 CMD ["gunicorn", "--worker-class", "sync", "-w", "1", "--bind", "0.0.0.0:5000", "backend.app:app"]
