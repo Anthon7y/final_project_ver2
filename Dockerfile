@@ -23,4 +23,4 @@ COPY backend/ /app/backend/
 COPY --from=frontend-builder /app/frontend/build/. /app/backend/static/
 
 EXPOSE 5000
-CMD gunicorn --worker-class sync -w 1 --bind 0.0.0.0:$PORT backend.app:app
+CMD gunicorn --worker-class sync -w 1 --bind 0.0.0.0:${PORT:-10000} backend.app:app
